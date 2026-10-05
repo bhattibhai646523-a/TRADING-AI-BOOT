@@ -1,0 +1,2950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LIVE GOLD AI ANALYZER — XAU/USD</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#05090d;
+    color:#eaf7ff;
+    font-family:Arial,Helvetica,sans-serif;
+    min-height:100vh;
+}
+
+.header{
+    height:72px;
+    background:#091219;
+    border-bottom:1px solid #1c3542;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+}
+
+.logo{
+    color:#00eaff;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.logo span{
+    color:white;
+}
+
+.connection{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-size:13px;
+    color:#91a8b6;
+}
+
+.status-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#777;
+}
+
+.status-dot.live{
+    background:#00e676;
+    box-shadow:0 0 14px #00e676;
+}
+
+.status-dot.error{
+    background:#ff3b3b;
+    box-shadow:0 0 14px #ff3b3b;
+}
+
+.container{
+    width:96%;
+    max-width:1500px;
+    margin:20px auto;
+}
+
+/* API */
+
+.api-box{
+    background:#0a131a;
+    border:1px solid #1e3846;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+}
+
+.api-title{
+    color:#00eaff;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.api-row{
+    display:flex;
+    gap:10px;
+}
+
+.api-input{
+    flex:1;
+    background:#050a0e;
+    border:1px solid #274453;
+    color:white;
+    padding:12px;
+    border-radius:7px;
+    outline:none;
+}
+
+.api-input:focus{
+    border-color:#00eaff;
+}
+
+.connect-btn{
+    background:#003d46;
+    color:#00eaff;
+    border:1px solid #00eaff;
+    padding:0 22px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.connect-btn:hover{
+    background:#00535e;
+}
+
+.message{
+    margin-top:9px;
+    color:#78909c;
+    font-size:12px;
+}
+
+/* TOOLBAR */
+
+.toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
+}
+
+button{
+    background:#0b171f;
+    color:#c8d8df;
+    border:1px solid #26424f;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+button:hover{
+    border-color:#00eaff;
+    color:#00eaff;
+}
+
+button.active{
+    color:#00eaff;
+    border-color:#00eaff;
+    background:#00343c;
+}
+
+.auto{
+    margin-left:auto;
+    color:#00e676;
+    border-color:#155b43;
+}
+
+/* MARKET CARDS */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.card{
+    background:#0a131a;
+    border:1px solid #1b3441;
+    border-radius:9px;
+    padding:15px;
+}
+
+.card-label{
+    color:#6f8794;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:8px;
+}
+
+.card-value{
+    font-size:23px;
+    font-weight:bold;
+}
+
+.cyan{
+    color:#00eaff;
+}
+
+.green{
+    color:#00e676;
+}
+
+.red{
+    color:#ff4d5a;
+}
+
+.yellow{
+    color:#ffd740;
+}
+
+/* MAIN */
+
+.main{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:15px;
+}
+
+.panel{
+    background:#0a131a;
+    border:1px solid #1b3441;
+    border-radius:10px;
+    padding:15px;
+}
+
+.panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.panel-head h2{
+    font-size:15px;
+}
+
+.panel-head span{
+    color:#708692;
+    font-size:11px;
+}
+
+/* CHART */
+
+.chart-container{
+    width:100%;
+    height:520px;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* SIGNAL */
+
+.signal-card{
+    text-align:center;
+    padding:25px 10px;
+    background:#060d12;
+    border:1px solid #203b48;
+    border-radius:9px;
+    margin-bottom:13px;
+}
+
+.signal{
+    font-size:40px;
+    font-weight:900;
+    letter-spacing:3px;
+}
+
+.signal.buy{
+    color:#00e676;
+    text-shadow:0 0 20px rgba(0,230,118,.4);
+}
+
+.signal.sell{
+    color:#ff4d5a;
+    text-shadow:0 0 20px rgba(255,77,90,.4);
+}
+
+.signal.wait{
+    color:#ffd740;
+}
+
+.signal-strength{
+    margin-top:7px;
+    color:#78909c;
+    font-size:12px;
+}
+
+/* ANALYSIS */
+
+.analysis-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.analysis-item{
+    background:#060d12;
+    border:1px solid #172c37;
+    border-radius:7px;
+    padding:11px;
+}
+
+.analysis-label{
+    color:#637b88;
+    font-size:10px;
+    text-transform:uppercase;
+    margin-bottom:5px;
+}
+
+.analysis-value{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.reasons{
+    margin-top:15px;
+}
+
+.reasons-title{
+    color:#78909c;
+    font-size:11px;
+    margin-bottom:7px;
+}
+
+.reason{
+    padding:8px;
+    border-bottom:1px solid #172831;
+    font-size:12px;
+    color:#b8c9d1;
+}
+
+.footer{
+    text-align:center;
+    padding:20px;
+    color:#536974;
+    font-size:11px;
+}
+
+/* MOBILE */
+
+@media(max-width:1100px){
+
+    .cards{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .main{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:650px){
+
+    .header{
+        padding:15px;
+        height:auto;
+        gap:12px;
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .api-row{
+        flex-direction:column;
+    }
+
+    .connect-btn{
+        padding:12px;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .chart-container{
+        height:380px;
+    }
+
+    .auto{
+        margin-left:0;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        GOLD <span>AI ANALYZER</span> — XAU/USD
+    </div>
+
+    <div class="connection">
+
+        <div id="statusDot" class="status-dot"></div>
+
+        <span id="statusText">
+            DISCONNECTED
+        </span>
+
+    </div>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- API -->
+
+<div class="api-box">
+
+    <div class="api-title">
+        TWELVE DATA API
+    </div>
+
+    <div class="api-row">
+
+        <input
+            id="apiKey"
+            class="api-input"
+            type="password"
+            placeholder="Paste your Twelve Data API key"
+        >
+
+        <button
+            id="connectButton"
+            class="connect-btn"
+        >
+            CONNECT LIVE
+        </button>
+
+    </div>
+
+    <div id="message" class="message">
+        API key enter karo aur CONNECT LIVE press karo.
+    </div>
+
+</div>
+
+
+<!-- TIMEFRAME -->
+
+<div class="toolbar">
+
+    <button
+        class="time-button active"
+        data-time="1min"
+    >
+        1 MIN
+    </button>
+
+    <button
+        class="time-button"
+        data-time="5min"
+    >
+        5 MIN
+    </button>
+
+    <button
+        class="time-button"
+        data-time="15min"
+    >
+        15 MIN
+    </button>
+
+    <button
+        class="time-button"
+        data-time="1h"
+    >
+        1 HOUR
+    </button>
+
+    <button
+        id="reconnectButton"
+    >
+        RECONNECT
+    </button>
+
+    <button
+        id="autoButton"
+        class="auto"
+    >
+        ● AUTO LIVE
+    </button>
+
+</div>
+
+
+<!-- MARKET CARDS -->
+
+<div class="cards">
+
+    <div class="card">
+        <div class="card-label">
+            XAU/USD
+        </div>
+
+        <div
+            id="price"
+            class="card-value cyan"
+        >
+            --
+        </div>
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-label">
+            Change
+        </div>
+
+        <div
+            id="change"
+            class="card-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-label">
+            EMA 20
+        </div>
+
+        <div
+            id="ema20"
+            class="card-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-label">
+            EMA 50
+        </div>
+
+        <div
+            id="ema50"
+            class="card-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-label">
+            RSI
+        </div>
+
+        <div
+            id="rsi"
+            class="card-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-label">
+            ATR
+        </div>
+
+        <div
+            id="atr"
+            class="card-value"
+        >
+            --
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+
+<!-- CHART -->
+
+<section class="panel">
+
+    <div class="panel-head">
+
+        <h2>
+            LIVE XAU/USD
+        </h2>
+
+        <span id="lastTick">
+            Waiting...
+        </span>
+
+    </div>
+
+    <div class="chart-container">
+
+        <canvas id="chart"></canvas>
+
+    </div>
+
+</section>
+
+
+<!-- ANALYSIS -->
+
+<section class="panel">
+
+    <div class="panel-head">
+
+        <h2>
+            MARKET PREDICTION
+        </h2>
+
+        <span id="candleCount">
+            0 candles
+        </span>
+
+    </div>
+
+
+    <div class="signal-card">
+
+        <div
+            id="signal"
+            class="signal wait"
+        >
+            WAIT
+        </div>
+
+        <div
+            id="signalStrength"
+            class="signal-strength"
+        >
+            Waiting for live market...
+        </div>
+
+    </div>
+
+
+    <div class="analysis-grid">
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Trend
+            </div>
+
+            <div
+                id="trend"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                EMA
+            </div>
+
+            <div
+                id="emaSignal"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                RSI
+            </div>
+
+            <div
+                id="rsiSignal"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Candle
+            </div>
+
+            <div
+                id="candleSignal"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Support
+            </div>
+
+            <div
+                id="support"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Resistance
+            </div>
+
+            <div
+                id="resistance"
+                class="analysis-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Buy Score
+            </div>
+
+            <div
+                id="buyScore"
+                class="analysis-value green"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="analysis-item">
+
+            <div class="analysis-label">
+                Sell Score
+            </div>
+
+            <div
+                id="sellScore"
+                class="analysis-value red"
+            >
+                0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="reasons">
+
+        <div class="reasons-title">
+            ANALYSIS REASONS
+        </div>
+
+        <div id="reasons">
+
+            <div class="reason">
+                Waiting for market data...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<div class="footer">
+
+    LIVE GOLD ANALYZER • XAU/USD • Analysis Only • No Broker Orders
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GOLD AI ANALYZER
+   ONE FILE VERSION
+========================================================= */
+
+
+/* -------------------------
+   SETTINGS
+------------------------- */
+
+const SYMBOL = "XAU/USD";
+
+let apiKey = "";
+
+let socket = null;
+
+let reconnectTimer = null;
+
+let heartbeatTimer = null;
+
+let currentTimeframe = "1min";
+
+let livePrice = null;
+
+let previousLivePrice = null;
+
+let candles = [];
+
+let autoLive = true;
+
+let lastCandleMinute = null;
+
+
+/* -------------------------
+   DOM
+------------------------- */
+
+const $ = id => document.getElementById(id);
+
+const apiInput = $("apiKey");
+
+const connectButton = $("connectButton");
+
+const reconnectButton = $("reconnectButton");
+
+const autoButton = $("autoButton");
+
+const statusDot = $("statusDot");
+
+const statusText = $("statusText");
+
+const message = $("message");
+
+const chart = $("chart");
+
+const ctx = chart.getContext("2d");
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setStatus(type,text){
+
+    statusDot.className = "status-dot";
+
+    if(type === "live"){
+        statusDot.classList.add("live");
+    }
+
+    if(type === "error"){
+        statusDot.classList.add("error");
+    }
+
+    statusText.textContent = text;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function setMessage(text){
+
+    message.textContent = text;
+
+}
+
+
+/* =========================================================
+   FORMAT
+========================================================= */
+
+function num(value,digits=2){
+
+    if(
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(Number(value))
+    ){
+        return "--";
+    }
+
+    return Number(value).toFixed(digits);
+
+}
+
+
+/* =========================================================
+   CONNECT
+========================================================= */
+
+function connectLive(){
+
+    apiKey =
+        apiInput.value.trim();
+
+    if(!apiKey){
+
+        setStatus("error","NO API KEY");
+
+        setMessage(
+            "Pehle Twelve Data API key enter karo."
+        );
+
+        return;
+    }
+
+
+    closeSocket();
+
+
+    setStatus(
+        "",
+        "CONNECTING..."
+    );
+
+    setMessage(
+        "Twelve Data WebSocket se connect ho raha hai..."
+    );
+
+
+    const url =
+        "wss://ws.twelvedata.com/v1/quotes/price?apikey=" +
+        encodeURIComponent(apiKey);
+
+
+    try{
+
+        socket =
+            new WebSocket(url);
+
+
+        socket.onopen = function(){
+
+            setStatus(
+                "live",
+                "LIVE"
+            );
+
+            setMessage(
+                "Connected. XAU/USD live stream active."
+            );
+
+
+            const subscribe = {
+
+                action:"subscribe",
+
+                params:{
+                    symbols:SYMBOL
+                }
+
+            };
+
+
+            socket.send(
+                JSON.stringify(subscribe)
+            );
+
+
+            startHeartbeat();
+
+            loadHistoricalData();
+
+        };
+
+
+        socket.onmessage = function(event){
+
+            handleWebSocketMessage(
+                event.data
+            );
+
+        };
+
+
+        socket.onerror = function(){
+
+            setStatus(
+                "error",
+                "WS ERROR"
+            );
+
+            setMessage(
+                "WebSocket error. API key/plan/symbol access check karo."
+            );
+
+        };
+
+
+        socket.onclose = function(){
+
+            stopHeartbeat();
+
+            setStatus(
+                "error",
+                "DISCONNECTED"
+            );
+
+
+            if(autoLive){
+
+                setMessage(
+                    "Connection lost — reconnecting..."
+                );
+
+                scheduleReconnect();
+
+            }
+
+        };
+
+
+    }catch(error){
+
+        setStatus(
+            "error",
+            "ERROR"
+        );
+
+        setMessage(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+function closeSocket(){
+
+    if(reconnectTimer){
+
+        clearTimeout(
+            reconnectTimer
+        );
+
+        reconnectTimer = null;
+
+    }
+
+
+    stopHeartbeat();
+
+
+    if(socket){
+
+        try{
+            socket.close();
+        }catch(e){}
+
+        socket = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   RECONNECT
+========================================================= */
+
+function scheduleReconnect(){
+
+    if(reconnectTimer){
+        return;
+    }
+
+    reconnectTimer =
+        setTimeout(()=>{
+
+            reconnectTimer = null;
+
+            connectLive();
+
+        },5000);
+
+}
+
+
+/* =========================================================
+   HEARTBEAT
+========================================================= */
+
+function startHeartbeat(){
+
+    stopHeartbeat();
+
+
+    heartbeatTimer =
+        setInterval(()=>{
+
+            if(
+                socket &&
+                socket.readyState === WebSocket.OPEN
+            ){
+
+                socket.send(
+                    JSON.stringify({
+                        action:"heartbeat"
+                    })
+                );
+
+            }
+
+        },10000);
+
+}
+
+
+function stopHeartbeat(){
+
+    if(heartbeatTimer){
+
+        clearInterval(
+            heartbeatTimer
+        );
+
+        heartbeatTimer = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   WEBSOCKET MESSAGE
+========================================================= */
+
+function handleWebSocketMessage(raw){
+
+    let data;
+
+    try{
+
+        data =
+            JSON.parse(raw);
+
+    }catch(error){
+
+        return;
+
+    }
+
+
+    console.log(
+        "Twelve Data:",
+        data
+    );
+
+
+    /* ERROR */
+
+    if(
+        data.status === "error" ||
+        data.type === "error"
+    ){
+
+        setStatus(
+            "error",
+            "API ERROR"
+        );
+
+        setMessage(
+            data.message ||
+            data.code ||
+            "Twelve Data error"
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Twelve Data price messages normally contain
+       symbol and price fields.
+    */
+
+    const price =
+        Number(
+            data.price ??
+            data.close ??
+            data.value
+        );
+
+
+    if(
+        !Number.isFinite(price)
+    ){
+
+        return;
+
+    }
+
+
+    previousLivePrice =
+        livePrice;
+
+    livePrice =
+        price;
+
+
+    updateLivePrice();
+
+    updateCurrentCandle();
+
+    analyzeMarket();
+
+    drawChart();
+
+
+    $("lastTick").textContent =
+        new Date().toLocaleTimeString();
+
+}
+
+
+/* =========================================================
+   LIVE PRICE
+========================================================= */
+
+function updateLivePrice(){
+
+    $("price").textContent =
+        num(livePrice,2);
+
+
+    if(
+        previousLivePrice !== null
+    ){
+
+        const change =
+            (
+                (livePrice - previousLivePrice)
+                /
+                previousLivePrice
+            ) * 100;
+
+
+        $("change").textContent =
+            (
+                change >= 0 ? "+" : ""
+            ) +
+            num(change,3) +
+            "%";
+
+
+        $("change").className =
+            "card-value " +
+            (
+                change >= 0
+                ? "green"
+                : "red"
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   HISTORICAL DATA
+========================================================= */
+
+async function loadHistoricalData(){
+
+    if(!apiKey){
+        return;
+    }
+
+
+    try{
+
+        const url =
+            "https://api.twelvedata.com/time_series" +
+            "?symbol=" +
+            encodeURIComponent(SYMBOL) +
+            "&interval=" +
+            encodeURIComponent(currentTimeframe) +
+            "&outputsize=150" +
+            "&apikey=" +
+            encodeURIComponent(apiKey);
+
+
+        const response =
+            await fetch(url);
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            data.status === "error"
+        ){
+
+            setMessage(
+                data.message ||
+                "Historical data error"
+            );
+
+            return;
+
+        }
+
+
+        if(
+            !Array.isArray(data.values)
+        ){
+
+            setMessage(
+                "Historical candle data nahi mili."
+            );
+
+            return;
+
+        }
+
+
+        candles =
+            data.values
+            .map(item => ({
+
+                time:item.datetime,
+
+                open:Number(item.open),
+
+                high:Number(item.high),
+
+                low:Number(item.low),
+
+                close:Number(item.close)
+
+            }))
+            .filter(c =>
+                Number.isFinite(c.open) &&
+                Number.isFinite(c.high) &&
+                Number.isFinite(c.low) &&
+                Number.isFinite(c.close)
+            )
+            .reverse();
+
+
+        $("candleCount").textContent =
+            candles.length +
+            " candles";
+
+
+        analyzeMarket();
+
+        drawChart();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        setMessage(
+            "Historical data error: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CURRENT CANDLE
+========================================================= */
+
+function updateCurrentCandle(){
+
+    if(!livePrice){
+        return;
+    }
+
+
+    const now =
+        new Date();
+
+
+    let candleTime;
+
+
+    if(currentTimeframe === "1min"){
+
+        candleTime =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours(),
+                now.getMinutes()
+            );
+
+    }else if(currentTimeframe === "5min"){
+
+        const m =
+            Math.floor(
+                now.getMinutes() / 5
+            ) * 5;
+
+        candleTime =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours(),
+                m
+            );
+
+    }else if(currentTimeframe === "15min"){
+
+        const m =
+            Math.floor(
+                now.getMinutes() / 15
+            ) * 15;
+
+        candleTime =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours(),
+                m
+            );
+
+    }else{
+
+        candleTime =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours()
+            );
+
+    }
+
+
+    const key =
+        candleTime.toISOString();
+
+
+    let candle =
+        candles[candles.length-1];
+
+
+    if(
+        !candle ||
+        candle.time !== key
+    ){
+
+        candle = {
+
+            time:key,
+
+            open:livePrice,
+
+            high:livePrice,
+
+            low:livePrice,
+
+            close:livePrice
+
+        };
+
+
+        candles.push(candle);
+
+
+        if(candles.length > 180){
+
+            candles.shift();
+
+        }
+
+    }else{
+
+        candle.close =
+            livePrice;
+
+        candle.high =
+            Math.max(
+                candle.high,
+                livePrice
+            );
+
+        candle.low =
+            Math.min(
+                candle.low,
+                livePrice
+            );
+
+    }
+
+
+    $("candleCount").textContent =
+        candles.length +
+        " candles";
+
+}
+
+
+/* =========================================================
+   EMA
+========================================================= */
+
+function calculateEMA(values,period){
+
+    if(values.length < period){
+        return null;
+    }
+
+
+    const multiplier =
+        2 / (period + 1);
+
+
+    let ema =
+        values
+        .slice(0,period)
+        .reduce(
+            (a,b)=>a+b,
+            0
+        ) / period;
+
+
+    for(
+        let i=period;
+        i<values.length;
+        i++
+    ){
+
+        ema =
+            (
+                (values[i]-ema)
+                *
+                multiplier
+            ) + ema;
+
+    }
+
+
+    return ema;
+
+}
+
+
+/* =========================================================
+   RSI
+========================================================= */
+
+function calculateRSI(values,period=14){
+
+    if(values.length <= period){
+        return null;
+    }
+
+
+    let gain = 0;
+
+    let loss = 0;
+
+
+    for(
+        let i=1;
+        i<=period;
+        i++
+    ){
+
+        const difference =
+            values[i] -
+            values[i-1];
+
+
+        if(difference >= 0){
+
+            gain += difference;
+
+        }else{
+
+            loss +=
+                Math.abs(
+                    difference
+                );
+
+        }
+
+    }
+
+
+    let avgGain =
+        gain / period;
+
+    let avgLoss =
+        loss / period;
+
+
+    for(
+        let i=period+1;
+        i<values.length;
+        i++
+    ){
+
+        const difference =
+            values[i] -
+            values[i-1];
+
+
+        const currentGain =
+            Math.max(
+                difference,
+                0
+            );
+
+
+        const currentLoss =
+            Math.max(
+                -difference,
+                0
+            );
+
+
+        avgGain =
+            (
+                avgGain*(period-1)
+                +
+                currentGain
+            ) / period;
+
+
+        avgLoss =
+            (
+                avgLoss*(period-1)
+                +
+                currentLoss
+            ) / period;
+
+    }
+
+
+    if(avgLoss === 0){
+        return 100;
+    }
+
+
+    const rs =
+        avgGain / avgLoss;
+
+
+    return 100 -
+        (
+            100 /
+            (1+rs)
+        );
+
+}
+
+
+/* =========================================================
+   ATR
+========================================================= */
+
+function calculateATR(data,period=14){
+
+    if(data.length <= period){
+        return null;
+    }
+
+
+    const trs = [];
+
+
+    for(
+        let i=1;
+        i<data.length;
+        i++
+    ){
+
+        const current =
+            data[i];
+
+        const previous =
+            data[i-1];
+
+
+        const tr =
+            Math.max(
+
+                current.high -
+                current.low,
+
+                Math.abs(
+                    current.high -
+                    previous.close
+                ),
+
+                Math.abs(
+                    current.low -
+                    previous.close
+                )
+
+            );
+
+
+        trs.push(tr);
+
+    }
+
+
+    const recent =
+        trs.slice(-period);
+
+
+    return recent.reduce(
+        (a,b)=>a+b,
+        0
+    ) / recent.length;
+
+}
+
+
+/* =========================================================
+   SUPPORT / RESISTANCE
+========================================================= */
+
+function calculateLevels(data){
+
+    const recent =
+        data.slice(-50);
+
+
+    if(!recent.length){
+
+        return {
+            support:null,
+            resistance:null
+        };
+
+    }
+
+
+    const lows =
+        recent.map(
+            c=>c.low
+        );
+
+
+    const highs =
+        recent.map(
+            c=>c.high
+        );
+
+
+    return {
+
+        support:
+            Math.min(...lows),
+
+        resistance:
+            Math.max(...highs)
+
+    };
+
+}
+
+
+/* =========================================================
+   MARKET ANALYSIS
+========================================================= */
+
+function analyzeMarket(){
+
+    if(candles.length < 50){
+        return;
+    }
+
+
+    const closes =
+        candles.map(
+            c=>c.close
+        );
+
+
+    const price =
+        closes[closes.length-1];
+
+
+    const ema20 =
+        calculateEMA(
+            closes,
+            20
+        );
+
+
+    const ema50 =
+        calculateEMA(
+            closes,
+            50
+        );
+
+
+    const rsi =
+        calculateRSI(
+            closes,
+            14
+        );
+
+
+    const atr =
+        calculateATR(
+            candles,
+            14
+        );
+
+
+    const levels =
+        calculateLevels(
+            candles
+        );
+
+
+    const latest =
+        candles[
+            candles.length-1
+        ];
+
+
+    $("ema20").textContent =
+        num(ema20,2);
+
+
+    $("ema50").textContent =
+        num(ema50,2);
+
+
+    $("rsi").textContent =
+        num(rsi,1);
+
+
+    $("atr").textContent =
+        num(atr,2);
+
+
+    $("support").textContent =
+        num(
+            levels.support,
+            2
+        );
+
+
+    $("resistance").textContent =
+        num(
+            levels.resistance,
+            2
+        );
+
+
+    let buy = 0;
+
+    let sell = 0;
+
+    const reasons = [];
+
+
+    /* TREND */
+
+    if(ema20 > ema50){
+
+        buy += 2;
+
+        $("trend").textContent =
+            "BULLISH";
+
+        $("trend").className =
+            "analysis-value green";
+
+        $("emaSignal").textContent =
+            "BUY";
+
+        $("emaSignal").className =
+            "analysis-value green";
+
+        reasons.push(
+            "EMA20 > EMA50: bullish trend."
+        );
+
+    }else{
+
+        sell += 2;
+
+        $("trend").textContent =
+            "BEARISH";
+
+        $("trend").className =
+            "analysis-value red";
+
+        $("emaSignal").textContent =
+            "SELL";
+
+        $("emaSignal").className =
+            "analysis-value red";
+
+        reasons.push(
+            "EMA20 < EMA50: bearish trend."
+        );
+
+    }
+
+
+    /* PRICE / EMA */
+
+    if(price > ema20){
+
+        buy++;
+
+        reasons.push(
+            "Price EMA20 ke upar hai."
+        );
+
+    }else{
+
+        sell++;
+
+        reasons.push(
+            "Price EMA20 ke neeche hai."
+        );
+
+    }
+
+
+    /* RSI */
+
+    if(rsi < 30){
+
+        buy += 2;
+
+        $("rsiSignal").textContent =
+            "OVERSOLD";
+
+        $("rsiSignal").className =
+            "analysis-value green";
+
+        reasons.push(
+            "RSI < 30: oversold condition."
+        );
+
+    }else if(rsi > 70){
+
+        sell += 2;
+
+        $("rsiSignal").textContent =
+            "OVERBOUGHT";
+
+        $("rsiSignal").className =
+            "analysis-value red";
+
+        reasons.push(
+            "RSI > 70: overbought condition."
+        );
+
+    }else if(rsi >= 50){
+
+        buy++;
+
+        $("rsiSignal").textContent =
+            "BULLISH";
+
+        $("rsiSignal").className =
+            "analysis-value green";
+
+        reasons.push(
+            "RSI > 50: bullish momentum."
+        );
+
+    }else{
+
+        sell++;
+
+        $("rsiSignal").textContent =
+            "BEARISH";
+
+        $("rsiSignal").className =
+            "analysis-value red";
+
+        reasons.push(
+            "RSI < 50: bearish momentum."
+        );
+
+    }
+
+
+    /* CANDLE */
+
+    if(
+        latest.close >
+        latest.open
+    ){
+
+        buy++;
+
+        $("candleSignal").textContent =
+            "BULLISH";
+
+        $("candleSignal").className =
+            "analysis-value green";
+
+        reasons.push(
+            "Latest candle bullish hai."
+        );
+
+    }else{
+
+        sell++;
+
+        $("candleSignal").textContent =
+            "BEARISH";
+
+        $("candleSignal").className =
+            "analysis-value red";
+
+        reasons.push(
+            "Latest candle bearish hai."
+        );
+
+    }
+
+
+    /* SUPPORT / RESISTANCE */
+
+    const range =
+        levels.resistance -
+        levels.support;
+
+
+    if(range > 0){
+
+        const position =
+            (
+                price -
+                levels.support
+            ) / range;
+
+
+        if(position < 0.25){
+
+            buy++;
+
+            reasons.push(
+                "Price support ke qareeb hai."
+            );
+
+        }else if(position > 0.75){
+
+            sell++;
+
+            reasons.push(
+                "Price resistance ke qareeb hai."
+            );
+
+        }
+
+    }
+
+
+    /* MOMENTUM */
+
+    if(closes.length > 6){
+
+        const old =
+            closes[
+                closes.length-6
+            ];
+
+
+        if(price > old){
+
+            buy++;
+
+            reasons.push(
+                "Short-term momentum positive hai."
+            );
+
+        }else{
+
+            sell++;
+
+            reasons.push(
+                "Short-term momentum negative hai."
+            );
+
+        }
+
+    }
+
+
+    /* FINAL SIGNAL */
+
+    let signal =
+        "WAIT";
+
+
+    /*
+       Strong confirmation required.
+       Conflicting conditions => WAIT.
+    */
+
+    if(
+        buy >= 6 &&
+        buy >= sell + 2
+    ){
+
+        signal =
+            "BUY";
+
+    }else if(
+        sell >= 6 &&
+        sell >= buy + 2
+    ){
+
+        signal =
+            "SELL";
+
+    }
+
+
+    const maxScore =
+        Math.max(
+            buy,
+            sell
+        );
+
+
+    let strength =
+        Math.round(
+            (
+                maxScore /
+                9
+            ) * 100
+        );
+
+
+    strength =
+        Math.max(
+            20,
+            Math.min(
+                95,
+                strength
+            )
+        );
+
+
+    $("signal").textContent =
+        signal;
+
+
+    $("signal").className =
+        "signal " +
+        signal.toLowerCase();
+
+
+    $("signalStrength").textContent =
+        strength +
+        "% confirmation strength";
+
+
+    $("buyScore").textContent =
+        buy;
+
+
+    $("sellScore").textContent =
+        sell;
+
+
+    $("reasons").innerHTML =
+        reasons
+        .map(
+            reason =>
+            `<div class="reason">
+                ${escapeHTML(reason)}
+            </div>`
+        )
+        .join("");
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function resizeCanvas(){
+
+    const rect =
+        chart.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio ||
+        1;
+
+
+    chart.width =
+        rect.width *
+        dpr;
+
+
+    chart.height =
+        rect.height *
+        dpr;
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+}
+
+
+function drawChart(){
+
+    resizeCanvas();
+
+
+    const rect =
+        chart.getBoundingClientRect();
+
+
+    const width =
+        rect.width;
+
+
+    const height =
+        rect.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if(candles.length < 2){
+        return;
+    }
+
+
+    const visible =
+        candles.slice(-80);
+
+
+    const values = [];
+
+
+    visible.forEach(c=>{
+
+        values.push(c.high);
+        values.push(c.low);
+
+    });
+
+
+    const min =
+        Math.min(...values);
+
+
+    const max =
+        Math.max(...values);
+
+
+    const top =
+        25;
+
+
+    const bottom =
+        35;
+
+
+    const chartHeight =
+        height -
+        top -
+        bottom;
+
+
+    const range =
+        max -
+        min;
+
+
+    function y(value){
+
+        if(range === 0){
+            return height/2;
+        }
+
+
+        return top +
+            (
+                (max-value) /
+                range
+            ) *
+            chartHeight;
+
+    }
+
+
+    /* GRID */
+
+    ctx.strokeStyle =
+        "#172b35";
+
+    ctx.lineWidth = 1;
+
+
+    for(
+        let i=0;
+        i<6;
+        i++
+    ){
+
+        const gy =
+            top +
+            (
+                chartHeight /
+                5
+            ) *
+            i;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            10,
+            gy
+        );
+
+        ctx.lineTo(
+            width-10,
+            gy
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* CANDLES */
+
+    const candleWidth =
+        (
+            width - 20
+        ) /
+        visible.length;
+
+
+    visible.forEach(
+        (candle,index)=>{
+
+            const x =
+                10 +
+                candleWidth *
+                index +
+                candleWidth/2;
+
+
+            const openY =
+                y(candle.open);
+
+
+            const closeY =
+                y(candle.close);
+
+
+            const highY =
+                y(candle.high);
+
+
+            const lowY =
+                y(candle.low);
+
+
+            const bullish =
+                candle.close >=
+                candle.open;
+
+
+            ctx.strokeStyle =
+                bullish
+                ? "#00e676"
+                : "#ff4d5a";
+
+
+            ctx.fillStyle =
+                bullish
+                ? "#00e676"
+                : "#ff4d5a";
+
+
+            /* WICK */
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                x,
+                highY
+            );
+
+            ctx.lineTo(
+                x,
+                lowY
+            );
+
+            ctx.stroke();
+
+
+            /* BODY */
+
+            const bodyTop =
+                Math.min(
+                    openY,
+                    closeY
+                );
+
+
+            const bodyHeight =
+                Math.max(
+                    1,
+                    Math.abs(
+                        closeY -
+                        openY
+                    )
+                );
+
+
+            ctx.fillRect(
+                x -
+                candleWidth*.30,
+
+                bodyTop,
+
+                candleWidth*.60,
+
+                bodyHeight
+            );
+
+        }
+    );
+
+
+    /* PRICE */
+
+    if(livePrice){
+
+        const py =
+            y(livePrice);
+
+
+        ctx.strokeStyle =
+            "#ffffff";
+
+
+        ctx.setLineDash([
+            5,
+            5
+        ]);
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            10,
+            py
+        );
+
+        ctx.lineTo(
+            width-10,
+            py
+        );
+
+        ctx.stroke();
+
+
+        ctx.setLineDash([]);
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.font =
+            "12px Arial";
+
+
+        ctx.fillText(
+            num(livePrice,2),
+            width-80,
+            py-6
+        );
+
+    }
+
+
+    /* EMA LINES */
+
+    const closes =
+        visible.map(
+            c=>c.close
+        );
+
+
+    const ema20 =
+        calculateEMAArray(
+            closes,
+            20
+        );
+
+
+    const ema50 =
+        calculateEMAArray(
+            closes,
+            50
+        );
+
+
+    drawEMA(
+        ema20,
+        width,
+        y,
+        "#00eaff"
+    );
+
+
+    drawEMA(
+        ema50,
+        width,
+        y,
+        "#ffd740"
+    );
+
+}
+
+
+/* =========================================================
+   EMA ARRAY
+========================================================= */
+
+function calculateEMAArray(
+    values,
+    period
+){
+
+    const result =
+        new Array(
+            values.length
+        ).fill(null);
+
+
+    if(
+        values.length <
+        period
+    ){
+
+        return result;
+
+    }
+
+
+    const multiplier =
+        2 /
+        (
+            period+1
+        );
+
+
+    let ema =
+        values
+        .slice(
+            0,
+            period
+        )
+        .reduce(
+            (a,b)=>a+b,
+            0
+        ) / period;
+
+
+    result[
+        period-1
+    ] = ema;
+
+
+    for(
+        let i=period;
+        i<values.length;
+        i++
+    ){
+
+        ema =
+            (
+                (
+                    values[i]-ema
+                ) *
+                multiplier
+            ) + ema;
+
+
+        result[i] =
+            ema;
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   DRAW EMA
+========================================================= */
+
+function drawEMA(
+    values,
+    width,
+    y,
+    color
+){
+
+    ctx.strokeStyle =
+        color;
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+
+    let started =
+        false;
+
+
+    values.forEach(
+        (value,index)=>{
+
+            if(value === null){
+                return;
+            }
+
+
+            const x =
+                10 +
+                (
+                    index /
+                    (
+                        values.length-1
+                    )
+                ) *
+                (
+                    width-20
+                );
+
+
+            const yy =
+                y(value);
+
+
+            if(!started){
+
+                ctx.moveTo(
+                    x,
+                    yy
+                );
+
+                started = true;
+
+            }else{
+
+                ctx.lineTo(
+                    x,
+                    yy
+                );
+
+            }
+
+        }
+    );
+
+
+    ctx.stroke();
+
+}
+
+
+/* =========================================================
+   TIMEFRAME
+========================================================= */
+
+document
+.querySelectorAll(".time-button")
+.forEach(button=>{
+
+    button.addEventListener(
+        "click",
+        ()=>{
+
+            document
+            .querySelectorAll(
+                ".time-button"
+            )
+            .forEach(
+                b =>
+                b.classList.remove(
+                    "active"
+                )
+            );
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+            currentTimeframe =
+                button.dataset.time;
+
+
+            candles = [];
+
+
+            if(apiKey){
+
+                loadHistoricalData();
+
+            }
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+connectButton.addEventListener(
+    "click",
+    connectLive
+);
+
+
+reconnectButton.addEventListener(
+    "click",
+    ()=>{
+
+        if(!apiKey){
+
+            apiKey =
+                apiInput.value.trim();
+
+        }
+
+
+        if(!apiKey){
+
+            setMessage(
+                "API key enter karo."
+            );
+
+            return;
+
+        }
+
+
+        connectLive();
+
+    }
+);
+
+
+autoButton.addEventListener(
+    "click",
+    ()=>{
+
+        autoLive =
+            !autoLive;
+
+
+        if(autoLive){
+
+            autoButton.textContent =
+                "● AUTO LIVE";
+
+            autoButton.style.color =
+                "#00e676";
+
+        }else{
+
+            autoButton.textContent =
+                "○ AUTO RECONNECT OFF";
+
+            autoButton.style.color =
+                "#ffb74d";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+apiInput.addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key === "Enter"){
+
+            connectLive();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    drawChart
+);
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+setStatus(
+    "",
+    "READY"
+);
+
+</script>
+
+</body>
+</html>
